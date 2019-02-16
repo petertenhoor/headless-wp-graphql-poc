@@ -1,0 +1,56 @@
+sudo: required
+
+services:
+  - docker
+
+notifications:
+  email:
+    on_success: never
+    on_failure: never
+
+branches:
+  only:
+    - master
+    - develop
+
+cache:
+  apt: true
+
+
+# Set the global environment variables
+env:
+  matrix:
+    # These apply to the latest WP version that is available as a Docker image: https://hub.docker.com/_/wordpress/
+    - PHP_VERSION=5.6
+    - PHP_VERSION=7.1
+    - PHP_VERSION=7.2 COVERAGE=true LINT_SCHEMA=true
+
+before_install:
+- sudo rm /usr/local/bin/docker-compose
+- curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > docker-compose
+- chmod +x docker-compose
+- sudo mv docker-compose /usr/local/bin
+
+script:
+  - ./run-docker-tests.sh 'wpunit'
+  - ./run-docker-tests.sh 'functional'
+  - ./run-docker-tests.sh 'acceptance'
+
+after_success:
+  # Upload coverage to codecov
+  - |
+    if [[ "${COVERAGE}" == 'true' ]]; then
+      bash <(curl -s https://codecov.io/bash)
+    fi
+  # Install GraphQL Schema Linter
+  # Move to the WordPress Install
+  # Generate the Static Schema
+  # Lint the Schema
+  - |
+    if [ $LINT_SCHEMA == true ]; then
+      npm install -g graphql-schema-linter
+      cd $WP_CORE_DIR
+      wp graphql generate-static-schema
+      cd $WP_CORE_DIR/wp-content/plugins/wp-graphql
+      graphql-schema-linter ./schema.graphql
+    fi
