@@ -1,0 +1,49 @@
+{
+  "name": "wp-graphql-test-frontend",
+  "version": "1.0.0",
+  "description": "Front-end application built with Next.js for my wp graphql test.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development node server.js",
+    "start": "cross-env NODE_ENV=production node server.js 1337",
+    "build": "cross-env NODE_ENV=production next build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:petertenhoor/wp-graphql-test.git"
+  },
+  "author": "Peter ten Hoor",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/petertenhoor/wp-graphql-test/issues"
+  },
+  "homepage": "https://github.com/petertenhoor/wp-graphql-test#readme",
+  "devDependencies": {
+    "@babel/core": "^7.3.3",
+    "@babel/plugin-proposal-decorators": "^7.3.0",
+    "@babel/register": "^7.0.0",
+    "@weco/next-plugin-transpile-modules": "0.0.2",
+    "@zeit/next-sass": "^1.0.1",
+    "autoprefixer": "^9.4.7",
+    "cross-env": "^5.2.0",
+    "next": "^8.0.1",
+    "node-sass": "^4.11.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.2",
+    "react-dom": "^16.8.2",
+    "webpack": "^4.29.4"
+  },
+  "dependencies": {
+    "apollo-boost": "^0.1.28",
+    "apollo-cache-inmemory": "^1.4.3",
+    "apollo-client": "^2.4.13",
+    "apollo-link-http": "^1.5.11",
+    "compression": "^1.7.3",
+    "express": "^4.16.4",
+    "graphql": "^14.1.1",
+    "graphql-tag": "^2.10.1",
+    "isomorphic-fetch": "^2.2.1",
+    "react-apollo": "^2.4.1",
+    "react-fastclick": "^3.0.2"
+  }
+}
