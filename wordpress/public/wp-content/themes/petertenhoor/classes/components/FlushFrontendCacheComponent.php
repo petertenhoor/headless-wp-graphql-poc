@@ -12,7 +12,7 @@ class FlushFrontendCacheComponent extends Singleton
     /**
      * Define frontend cache flush url
      */
-    const FRONTEND_FLUSH_URL = 'http://127.0.0.1:3000/flush-ssr-cache';
+    const FRONTEND_FLUSH_URL = 'http://127.0.0.1:3000/flush-ssr-cache/';
 
     /**
      * FlushFrontendCacheComponent constructor.
@@ -23,8 +23,8 @@ class FlushFrontendCacheComponent extends Singleton
             add_action('deleted_post', [$this, 'flushFrontendCache']);
             add_action('edit_post', [$this, 'flushFrontendCache']);
             add_action('delete_attachment', [$this, 'flushFrontendCache']);
-            //TODO flush cache on save setting
             add_action('admin_bar_menu', [$this, 'addFlushCacheButton'], 100);
+            //TODO flush cache on save setting
         }
     }
 
@@ -36,7 +36,7 @@ class FlushFrontendCacheComponent extends Singleton
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "http://127.0.0.1:3000/flush-ssr-cache",
+            CURLOPT_URL => self::FRONTEND_FLUSH_URL,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CUSTOMREQUEST => "POST"
         ));
@@ -59,26 +59,27 @@ class FlushFrontendCacheComponent extends Singleton
         ?>
 
         <script type="application/javascript">
-            function clearFrontendCache(event) {
-                if (event) event.preventDefault()
+            function clearFrontendCache() {
 
                 var settings = {
                     "async": true,
                     "crossDomain": true,
-                    "url": "http://127.0.0.1:1337/flush-ssr-cache",
-                    "method": "GET"
-                }
+                    "url": "<?php echo self::FRONTEND_FLUSH_URL; ?>",
+                    "method": "POST"
+                };
 
-                $.ajax(settings).done(function (response) {
+                jQuery.ajax(settings).done(function (response) {
                     alert(response);
                 });
+
+                return false;
             }
         </script>
 
         <?php
         $args = array(
             'id' => 'cache-cleaner',
-            'title' => 'Clean frontend cache',
+            'title' => __('Clean frontend cache', Theme::TEXT_DOMAIN),
             'href' => '#',
             'meta' => array(
                 'onclick' => 'clearFrontendCache()'

@@ -1,9 +1,12 @@
-import Link from 'next/link'
+import Link from 'data-prefetch-link'
 import {Query} from 'react-apollo'
 import gql from 'graphql-tag'
+import {Col, Container, Row} from "react-grid-system";
 
 import {ADMIN_URL} from "../../constants";
 import stripFinalTrainlingSlash from "../../utils/stripFinalTrailingSlash";
+import styles from "./index.scss";
+import Loader from "../Loader";
 
 const GET_MAIN_NAV = gql`
 {
@@ -58,28 +61,42 @@ const Header = () => {
         <Query query={GET_MAIN_NAV}>
             {({loading, error, data}) => {
                 if (error) return <p>Error loading navigation</p>
-                if (loading) return <p>Loading..</p>
+                if (loading) return <Loader loaderText="Loading navigation.."/>
                 const {menuItems: {nodes: menuItems}} = data
 
                 return (
-                    <header>
-                        <h1>Peter ten Hoor</h1>
-                        <nav>
-                            {menuItems.map((menuItem) => {
-                                const {linkHref, linkAs} = getMenuLink(menuItem)
-                                return (
-                                    <Link prefetch
-                                          key={menuItem.id}
-                                          href={linkHref}
-                                          as={linkAs}>
-                                        <a target={menuItem.target !== null ? menuItem.target : "_self"}>
-                                            {menuItem.label}
+                    <Container component={'header'} fluid className={styles.header}>
+                        <Container style={{width: "100%", padding: "0"}}>
+                            <Row style={{width: "100%"}} align="center">
+                                <Col sm={3}>
+                                    <Link prefetch withData href="/" as="/">
+                                        <a>
+                                            <h2 className={styles.logo}>
+                                                PTH
+                                            </h2>
                                         </a>
                                     </Link>
-                                )
-                            })}
-                        </nav>
-                    </header>
+                                </Col>
+                                <Col sm={9} component="nav" className={styles.navigation}>
+                                    {menuItems.map((menuItem) => {
+                                        const {linkHref, linkAs} = getMenuLink(menuItem)
+                                        return (
+                                            <Link prefetch
+                                                  withData
+                                                  key={menuItem.id}
+                                                  href={linkHref}
+                                                  as={linkAs}>
+                                                <a className={styles.navigationLink}
+                                                   target={menuItem.target !== null ? menuItem.target : "_self"}>
+                                                    {menuItem.label}
+                                                </a>
+                                            </Link>
+                                        )
+                                    })}
+                                </Col>
+                            </Row>
+                        </Container>
+                    </Container>
                 )
             }}
         </Query>

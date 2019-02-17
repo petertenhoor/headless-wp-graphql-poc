@@ -40,13 +40,17 @@
     "apollo-link-http": "^1.5.11",
     "compression": "^1.7.3",
     "cors": "^2.8.5",
+    "data-prefetch-link": "^1.1.4",
     "express": "^4.16.4",
+    "fontfaceobserver": "^2.1.0",
     "graphql": "^14.1.1",
     "graphql-tag": "^2.10.1",
     "isomorphic-fetch": "^2.2.1",
     "lru-cache": "^5.1.1",
+    "moment": "^2.24.0",
     "next-apollo": "^2.0.8",
     "react-apollo": "^2.4.1",
-    "react-fastclick": "^3.0.2"
+    "react-fastclick": "^3.0.2",
+    "react-grid-system": "^4.4.2"
   }
 }

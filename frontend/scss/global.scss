@@ -1,0 +1,16 @@
+//fonts - this needs to be outside of the :global tag or it will NOT work.
+@import "./fonts/fjalla-one";
+@import "./fonts/noto-sans";
+
+:global {
+  //utils
+  @import "./utils/normalize";
+  @import "./utils/util-selected";
+
+  //components
+  @import "./component/component-global-typography";
+  @import "./component/component-heading";
+  @import "./component/component-strong";
+  @import "./component/component-link";
+  @import "./component/component-list";
+}

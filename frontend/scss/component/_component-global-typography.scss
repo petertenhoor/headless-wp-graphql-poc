@@ -1,0 +1,26 @@
+html {
+  color: #000;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  @extend %noto-sans;
+}
+
+p {
+  margin-bottom: 25px;
+  margin-top: 0;
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+p, li {
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 38px;
+  word-break: break-word;
+}
+
+p:empty {
+  display: none;
+}

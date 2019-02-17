@@ -8,6 +8,7 @@ require_once("utils/Log.php");
 
 //components
 require_once("components/FlushFrontendCacheComponent.php");
+require_once("components/MainNavigation.php");
 
 /**
  * Class Theme
@@ -17,11 +18,22 @@ require_once("components/FlushFrontendCacheComponent.php");
 class Theme extends Singleton
 {
     /**
+     * Define text domain
+     */
+    const TEXT_DOMAIN = 'petertenhoor';
+
+    /**
+     * Define image sizes
+     */
+    const IMAGE_SIZE_POST = 'imageSizePost';
+
+    /**
      * Theme constructor.
      */
     protected function __construct()
     {
         self::initComponents();
+        self::setImageSizes();
     }
 
     /**
@@ -30,6 +42,13 @@ class Theme extends Singleton
     public static function initComponents()
     {
         FlushFrontendCacheComponent::getInstance();
+        MainNavigation::getInstance();
+    }
+
+    public static function setImageSizes()
+    {
+        add_theme_support('post-thumbnails');
+        add_image_size(self::IMAGE_SIZE_POST, 450, 300, true);
     }
 }
 
