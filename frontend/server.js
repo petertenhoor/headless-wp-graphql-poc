@@ -1,47 +1,88 @@
 const express = require('express')
 const next = require('next')
 const compression = require("compression")
+const cors = require('cors')
 const LRUCache = require('lru-cache');
 
 const server = express()
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({dir: '.', dev})
 const handle = app.getRequestHandler()
-const port = process.argv[2] ? process.argv[2] : 1337
+const port = process.argv[2] ? process.argv[2] : 3000
 
-// This is where we cache our rendered HTML pages
+//set up SSR cache for 30 days with max amount of items to infinity
 const ssrCache = new LRUCache({
-    max: 100 * 1024 * 1024, /* cache size will be 100 MB using `return n.length` as length() function */
-    length: function (n, key) {
-        return n.length
-    },
+    max: 0,
     maxAge: 1000 * 60 * 60 * 24 * 30
-});
+})
 
 app.prepare().then(() => {
-    //use compression and helmet
+    //use compression
     server.use(compression({threshold: 0}))
+
+    //use cors
+    server.use(cors())
 
     server.get('/_next/*', (req, res) => {
         /* serving _next static content using next.js handler */
         handle(req, res);
     })
 
-    server.get('/posts/:slug', (req, res) => {
-        //app.render(req, res, '/post', {slug: req.params.slug})
-        return renderAndCacheDynamic(req, res, '/post', {slug: req.params.slug})
+    server.get('/posts', (req, res) => {
+        if (dev) {
+            handle(req, res)
+        } else {
+            return renderAndCache(req, res)
+        }
+    })
+
+    //add cache flush endpoint
+    server.post('/flush-ssr-cache', (req, res) => {
+        const amountOfItemsInCache = ssrCache.length
+        ssrCache.reset()
+        const newAmountOfItemsInCache = ssrCache.length
+        if (newAmountOfItemsInCache === 0) {
+            console.log(`Successfully flushed ${amountOfItemsInCache} items from cache.`)
+            res.status(200).send(`Successfully flushed ${amountOfItemsInCache} items from cache.`);
+        } else {
+            console.log(`Failed flushing ${amountOfItemsInCache} items from cache. There are still ${newAmountOfItemsInCache} in there.`)
+            res.status(500).send(`Failed flushing ${amountOfItemsInCache} items from cache. There are still ${newAmountOfItemsInCache} in there.`);
+        }
+    })
+
+    //add post route
+    server.get('/post/:slug/', (req, res) => {
+        if (dev) {
+            app.render(req, res, '/post', {slug: req.params.slug})
+        } else {
+            return renderAndCacheDynamic(req, res, '/post', {slug: req.params.slug})
+        }
+    })
+
+    //add page route
+    server.get('/:slug/', (req, res) => {
+        if (dev) {
+            app.render(req, res, '/page', {slug: req.params.slug})
+        } else {
+            return renderAndCacheDynamic(req, res, '/page', {slug: req.params.slug})
+        }
     })
 
     //let regular next handler handle all other requests
     server.get('*', (req, res) => {
-        /* serving page */
-        return renderAndCache(req, res)
+        if (dev) {
+            handle(req, res)
+        } else {
+            return renderAndCache(req, res)
+        }
     })
 })
 
 //Start server
 server.listen(port, (err) => {
     if (err) throw err
+    //clear cache
+    ssrCache.reset()
     console.log(`> Ready on http://localhost:${port}`)
 })
 
@@ -53,6 +94,13 @@ function getCacheKey(req) {
     return `${req.path}`
 }
 
+/**
+ * Render and cache simple route
+ *
+ * @param req
+ * @param res
+ * @returns {Promise<void>}
+ */
 async function renderAndCache(req, res) {
     const key = getCacheKey(req);
 
@@ -85,6 +133,15 @@ async function renderAndCache(req, res) {
     }
 }
 
+/**
+ * Handle and cache dynamic route
+ *
+ * @param req
+ * @param res
+ * @param path
+ * @param query
+ * @returns {Promise<void>}
+ */
 async function renderAndCacheDynamic(req, res, path, query) {
     const key = getCacheKey(req);
 

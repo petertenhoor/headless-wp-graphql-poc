@@ -14,10 +14,16 @@ function create(initialState) {
         connectToDevTools: process.browser,
         ssrMode: !process.browser, // Disables forceFetch on the server (so queries are only run once)
         link: new HttpLink({
-            uri: "http://192.168.13.37/graphql",
+            uri: "http://admin.petertenhoor.nl/graphql",
             credentials: 'same-origin' // Additional fetch() options like `credentials` or `headers`
         }),
-        cache: new InMemoryCache().restore(initialState || {})
+        cache: new InMemoryCache({
+            dataIdFromObject: obj => obj.id,
+            addTypename: false,
+            fragmentMatcher: {
+                match: ({id}, typeCond, context) => !!context.store.get(id)
+            }
+        }).restore(initialState || {})
     })
 }
 

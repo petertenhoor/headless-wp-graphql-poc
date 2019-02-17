@@ -1,42 +1,54 @@
-import Link from 'next/link'
-
 import {Query} from 'react-apollo'
 import gql from 'graphql-tag'
 
-const GET_POSTS = gql`
+import Layout from "../components/Layout";
+
+const GET_HOME_PAGE_ID = gql`
 {
-  posts {
-    nodes{
-      id
-      title
-      slug    
-      content
-      date
-    }
+  allSettings{
+    pageOnFront
   }
 }
 `;
 
+const GET_HOME_PAGE_CONTENT = gql`
+query HomeContent($id: Int) {
+ pageBy(pageId: $id) {
+    title
+    slug
+    content
+    date
+  }
+}
+`
+
 const HomePage = () => {
     return (
-        <Query query={GET_POSTS}>
+        <Query query={GET_HOME_PAGE_ID}>
             {({loading, error, data}) => {
-                if (error) return <p>Error loading posts</p>
-                if (loading) return <p>Loading..</p>
-
+                if (error) return <p>Error loading homepage id!</p>
+                if (loading) return <p>Loading homepage id..</p>
+                const {allSettings: {pageOnFront}} = data
                 return (
-                    <section>
-                        {data.posts.nodes.map((post) => (
-                            <article key={post.id}>
-                                <h3>{post.title}</h3>
-                                <span>{post.date}</span>
-                                <div dangerouslySetInnerHTML={{__html: post.content}}></div>
-                                <Link prefetch href={`/post?slug=${post.slug}`} as={`/posts/${post.slug}`}>
-                                    <a>Read more</a>
-                                </Link>
-                            </article>
-                        ))}
-                    </section>
+                    <Query query={GET_HOME_PAGE_CONTENT} variables={{id: pageOnFront}}>
+                        {({loading, error, data}) => {
+                            if (error) return <p>Error loading homepage content!</p>
+                            if (loading) return <p>Loading homepage content..</p>
+                            const {pageBy: page} = data
+
+                            return (
+                                <Layout metaTitle={`${page.title}`}>
+                                    <section>
+                                        <article>
+                                            <h1>{page.title}</h1>
+                                            <div dangerouslySetInnerHTML={{__html: page.content}}></div>
+                                        </article>
+                                    </section>
+                                </Layout>
+                            )
+
+                        }}
+                    </Query>
                 )
             }}
         </Query>
