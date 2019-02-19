@@ -1,4 +1,4 @@
-import Link from 'data-prefetch-link'
+import Link from 'next/link'
 import {Query} from "react-apollo";
 import gql from "graphql-tag";
 import moment from "moment";
@@ -63,7 +63,7 @@ const Post = ({slug}) => {
                             <div className={styles.postContent}
                                  dangerouslySetInnerHTML={{__html: post.content}}></div>
 
-                            <Link prefetch withData href={'/posts'} as={'/posts'}>
+                            <Link href={'/posts'} as={'/posts'}>
                                 <a className={styles.archiveLink}>Back to posts</a>
                             </Link>
 

@@ -9,6 +9,7 @@ require_once("utils/Log.php");
 //components
 require_once("components/FlushFrontendCacheComponent.php");
 require_once("components/MainNavigation.php");
+require_once("components/GraphqlCacheComponent.php");
 
 /**
  * Class Theme
@@ -43,8 +44,12 @@ class Theme extends Singleton
     {
         FlushFrontendCacheComponent::getInstance();
         MainNavigation::getInstance();
+        GraphqlCacheComponent::getInstance();
     }
 
+    /**
+     * Set image sizes
+     */
     public static function setImageSizes()
     {
         add_theme_support('post-thumbnails');

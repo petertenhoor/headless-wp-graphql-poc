@@ -1,12 +1,8 @@
 import {ApolloClient, InMemoryCache, HttpLink} from 'apollo-boost'
 import fetch from "isomorphic-fetch";
+import {Base64} from 'js-base64'
 
 let apolloClient = null
-
-// Polyfill fetch() on the server (used by apollo-client)
-if (!process.browser) {
-    global.fetch = fetch
-}
 
 function create(initialState) {
     // Check out https://github.com/zeit/next.js/pull/4611 if you want to use the AWSAppSyncClient
@@ -14,8 +10,9 @@ function create(initialState) {
         connectToDevTools: process.browser,
         ssrMode: !process.browser, // Disables forceFetch on the server (so queries are only run once)
         link: new HttpLink({
+            fetch: customFetch,
             uri: "http://admin.petertenhoor.nl/graphql",
-            credentials: 'same-origin' // Additional fetch() options like `credentials` or `headers`
+            credentials: 'same-origin'
         }),
         cache: new InMemoryCache({
             dataIdFromObject: obj => obj.id,
@@ -25,6 +22,19 @@ function create(initialState) {
             }
         }).restore(initialState || {})
     })
+}
+
+/**
+ * Custom fetch (add header for caching)
+ *
+ * @param uri
+ * @param options
+ * @returns {*}
+ */
+const customFetch = (uri, options) => {
+    const cacheKey = Base64.encode(JSON.stringify(options.body))
+    options.headers['x-graphql-cache'] = cacheKey
+    return fetch(uri, options)
 }
 
 export default function initApollo(initialState) {

@@ -1,4 +1,4 @@
-import Link from 'data-prefetch-link'
+import Link from 'next/link'
 import {Query} from 'react-apollo'
 import gql from 'graphql-tag'
 import {Col, Container, Row} from "react-grid-system";
@@ -69,7 +69,7 @@ const Header = () => {
                         <Container style={{width: "100%", padding: "0"}}>
                             <Row style={{width: "100%"}} align="center">
                                 <Col sm={3}>
-                                    <Link prefetch withData href="/" as="/">
+                                    <Link prefetch href="/" as="/">
                                         <a>
                                             <h2 className={styles.logo}>
                                                 PTH
@@ -82,7 +82,6 @@ const Header = () => {
                                         const {linkHref, linkAs} = getMenuLink(menuItem)
                                         return (
                                             <Link prefetch
-                                                  withData
                                                   key={menuItem.id}
                                                   href={linkHref}
                                                   as={linkAs}>
