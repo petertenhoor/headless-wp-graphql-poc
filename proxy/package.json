@@ -1,0 +1,30 @@
+{
+  "name": "wp-graphql-proxy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "pm2 start processes.json --env production",
+    "stop": "pm2 stop processes.json",
+    "delete": "pm2 delete processes.json",
+    "restart": "pm2 restart processes.json --env production"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-link-http": "^1.5.11",
+    "apollo-server": "^2.4.2",
+    "apollo-server-cache-redis": "^0.3.1",
+    "apollo-server-caching": "^0.3.1",
+    "apollo-server-express": "^2.4.2",
+    "express": "^4.16.4",
+    "graphql": "^14.1.1",
+    "graphql-tools": "^4.0.4",
+    "isomorphic-fetch": "^2.2.1",
+    "pm2": "^3.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10"
+  }
+}
